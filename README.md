@@ -1,14 +1,18 @@
-# Welcome to your CDK TypeScript project
+# Sample Lambda with X-Ray Tracing
 
-This is a blank project for TypeScript development with CDK.
+This CDK application is meant to be an example stack to reproduce issues with
+using X-Ray in the AWS GovCloud (US) partition.
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+The primary CDK logic is in `lib/lambda-xray-stack.ts`, which creates a Lambda
+Function with tracing enabled. It also happens to create an S3 bucket that we
+write to in the function.
 
-## Useful commands
+The code for the Lambda function is in `lambda/handler.ts`. It leverages the
+AWS Lambda PowerTools for TypeScript; however, the same issue can be reproduced
+with any X-Ray SDK in any language within the GovCloud (US) regions. The function
+writes the function event object to a file in the given S3 bucket. This gives a
+well-known, well-defined API call to try and capture via X-Ray. The function logs
+pretty verbosely.
 
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `cdk deploy`      deploy this stack to your default AWS account/region
-* `cdk diff`        compare deployed stack with current state
-* `cdk synth`       emits the synthesized CloudFormation template
+The `@aws-cdk/core:target-partitions` context key has been set to
+`["aws", "aws-us-gov"]`, as by default, the `aws-us-gov` partition is not included.
